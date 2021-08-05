@@ -1,0 +1,13 @@
+[gd_scene format=2]
+
+[node name="Main" type="Node"]
+
+[node name="SaveSystem" type="Node" parent="."]
+
+[node name="Planets" type="Node" parent="."]
+
+[node name="Stars" type="Node" parent="."]
+
+[node name="StarSystems" type="Node" parent="."]
+
+[node name="PlayerControls" type="Node" parent="."]
