@@ -6,10 +6,16 @@ var star
 
 func generate():
 	star = StellarObject.instance()
-	star.init()
+	star.init('star')
 	star.generate()
 	stars.append(star)
 
 
 func draw():
+	add_child(star)
 	star.draw()
+
+
+func destroy():
+	star.destroy()
+	queue_free()
