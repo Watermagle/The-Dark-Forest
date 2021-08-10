@@ -1,11 +1,10 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://fonts/Roboto/Roboto-Light.ttf" type="DynamicFontData" id=1]
 [ext_resource path="res://scripts/Controls.gd" type="Script" id=2]
 [ext_resource path="res://fonts/Roboto/Roboto-Regular.ttf" type="DynamicFontData" id=3]
 [ext_resource path="res://scripts/Camera.gd" type="Script" id=4]
 [ext_resource path="res://scripts/SystemGenerator.gd" type="Script" id=5]
-[ext_resource path="res://scripts/SaveSystem.gd" type="Script" id=6]
 
 [sub_resource type="DynamicFont" id=1]
 size = 48
@@ -25,12 +24,7 @@ pause_mode = 1
 [node name="Controls" type="Node" parent="."]
 script = ExtResource( 2 )
 
-[node name="SaveSystem" type="Node" parent="."]
-script = ExtResource( 6 )
-
-[node name="SystemGenerator" type="Node" parent="." groups=[
-"Persist",
-]]
+[node name="SystemGenerator" type="Node" parent="."]
 script = ExtResource( 5 )
 
 [node name="Camera" type="Camera2D" parent="."]
@@ -59,7 +53,7 @@ margin_top = 16.0
 margin_right = 692.0
 margin_bottom = 204.0
 custom_fonts/font = SubResource( 1 )
-text = "v0.1 Early Access Build 2"
+text = "v0.1 Early Access Build 3"
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -106,14 +100,14 @@ margin_top = 39.0
 margin_right = 222.0
 margin_bottom = 74.0
 custom_fonts/font = SubResource( 3 )
-text = "SAVE (WIP)"
+text = "SAVE"
 
 [node name="LoadButton" type="Button" parent="Camera/UI/DebugPanel/VBoxContainer"]
 margin_top = 78.0
 margin_right = 222.0
 margin_bottom = 113.0
 custom_fonts/font = SubResource( 3 )
-text = "LOAD (WIP)"
+text = "LOAD"
 
 [node name="ExitButton" type="Button" parent="Camera/UI/DebugPanel/VBoxContainer"]
 margin_top = 117.0
@@ -136,4 +130,6 @@ __meta__ = {
 }
 
 [connection signal="pressed" from="Camera/UI/DebugPanel/VBoxContainer/GenerateButton" to="SystemGenerator" method="_on_GenerateButton_pressed"]
+[connection signal="pressed" from="Camera/UI/DebugPanel/VBoxContainer/SaveButton" to="SystemGenerator" method="_on_SaveButton_pressed"]
+[connection signal="pressed" from="Camera/UI/DebugPanel/VBoxContainer/LoadButton" to="SystemGenerator" method="_on_LoadButton_pressed"]
 [connection signal="pressed" from="Camera/UI/DebugPanel/VBoxContainer/ExitButton" to="Controls" method="_on_ExitButton_pressed"]
