@@ -19,6 +19,8 @@ var randomRadius
 var moon_save_list = []
 var planet_save_list = []
 var save_dict = {}
+var moons_save = []
+var planets_save = []
 
 
 func init(inputStellarType):
@@ -105,42 +107,48 @@ func destroy():
 
 
 func save():
-	if (stellarType == 'gasPlanet') or (stellarType == 'solidPlanet'):
+	save_dict['position_x'] = position.x
+	save_dict['position_y'] = position.y
+	save_dict['scale_x'] = scale.x
+	save_dict['scale_y'] = scale.y
+	save_dict['self_modulate_r'] = self_modulate.r8
+	save_dict['self_modulate_g'] = self_modulate.g8
+	save_dict['self_modulate_b'] = self_modulate.b8
+	save_dict['stellarType'] = stellarType
+	if (stellarType == 'solidPlanet') or (stellarType == 'gasPlanet'):
+		moons_save = []
 		for moon in moons:
-			save_dict = inst2dict(moon)
-			save_dict["MOON_POSITION_X"] = moon.position.x
-			save_dict["MOON_POSITION_Y"] = moon.position.y
-			save_dict["MOON_SCALE_X"] = moon.scale.x
-			save_dict["MOON_SCALE_Y"] = moon.scale.y
-			moon_save_list.append(save_dict)
-	elif stellarType == 'star':
+			moon.save()
+			moons_save.append(moon.save_dict)
+		save_dict['moons'] = moons_save
+	if stellarType == 'star':
+		planets_save = []
 		for planet in planets:
 			planet.save()
-			save_dict = inst2dict(planet)
-			save_dict["PLANET_POSITION_X"] = planet.position.x
-			save_dict["PLANET_POSITION_Y"] = planet.position.y
-			save_dict["PLANET_SCALE_X"] = planet.scale.x
-			save_dict["PLANET_SCALE_Y"] = planet.scale.y
-			planet_save_list.append(save_dict)
+			planets_save.append(planet.save_dict)
+		save_dict['planets'] = planets_save
 
 
-func load_game():
-	if (stellarType == 'gasPlanet') or (stellarType == 'solidPlanet'):
+func load_game(save_dict):
+	stellarType = save_dict['stellarType']
+	position.x = save_dict['position_x']
+	position.y = save_dict['position_y']
+	scale.x = save_dict['scale_x']
+	scale.y = save_dict['scale_y']
+	self_modulate.r8 = save_dict['self_modulate_r']
+	self_modulate.g8 = save_dict['self_modulate_g']
+	self_modulate.b8 = save_dict['self_modulate_b']
+	if (stellarType == 'solidPlanet') or (stellarType == 'gasPlanet'):
+		moons_save = save_dict['moons']
 		moons = []
-		for moon in moon_save_list:
-			var new_moon = dict2inst(moon)
-			new_moon.position.x = float(moon["MOON_POSITION_X"])
-			new_moon.position.y = float(moon["MOON_POSITION_Y"])
-			new_moon.scale.x = float(moon["MOON_SCALE_X"])
-			new_moon.scale.y = float(moon["MOON_SCALE_Y"])
-			moons.append(new_moon)
-	elif stellarType == 'star':
+		for moon_save in moons_save:
+			moon = StellarObject.instance()
+			moon.load_game(moon_save)
+			moons.append(moon)
+	if stellarType == 'star':
+		planets_save = save_dict['planets']
 		planets = []
-		for planet in planet_save_list:
-			var new_planet = dict2inst(planet)
-			new_planet.position.x = float(planet["PLANET_POSITION_X"])
-			new_planet.position.y = float(planet["PLANET_POSITION_Y"])
-			new_planet.scale.x = float(planet["PLANET_SCALE_X"])
-			new_planet.scale.y = float(planet["PLANET_SCALE_Y"])
-			new_planet.load_game()
-			planets.append(new_planet)
+		for planet_save in planets_save:
+			planet = StellarObject.instance()
+			planet.load_game(planet_save)
+			planets.append(planet)

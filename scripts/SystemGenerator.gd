@@ -25,13 +25,13 @@ func generate():
 
 
 func save():
-	var save_game = File.new()
-	save_game.open("user://savegame.save", File.WRITE)
 	if isSystemGenerated == true:
+		var save_game = File.new()
+		save_game.open("user://savegame.save", File.WRITE)
 		starSystem.save()
-		save_dict = inst2dict(starSystem)
+		save_dict = starSystem.save_dict
 		save_game.store_line(to_json(save_dict))
-	save_game.close()
+		save_game.close()
 
 
 func load_game():
@@ -40,14 +40,15 @@ func load_game():
 		return
 	if isSystemGenerated == true:
 		starSystem.destroy()
+	isSystemGenerated = true
 	save_game.open("user://savegame.save", File.READ)
-	while save_game.get_position() < save_game.get_len():
-		save_dict = parse_json(save_game.get_line())
-		starSystem = dict2inst(save_dict)
-		systems = []
-		starSystem.load_game()
-		systems.append(starSystem)
-		starSystem.draw()
+	save_dict = parse_json(save_game.get_line())
+	starSystem = StarSystem.instance()
+	systems = []
+	starSystem.load_game(save_dict)
+	systems.append(starSystem)
+	add_child(starSystem)
+	starSystem.draw()
 
 
 func _on_GenerateButton_pressed():
