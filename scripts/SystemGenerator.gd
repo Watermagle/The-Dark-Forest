@@ -1,63 +1,48 @@
 extends Node
-var systems = []
+var systems = [0]
 var StarSystem = preload("res://scenes/StarSystem.tscn")
-var starSystem
-var isSystemGenerated = false
+var system
 var save_dict = {}
+var systems_save = []
+var current_system = 0
 
 
-func generate():
-	if isSystemGenerated == false:
-		starSystem = StarSystem.instance()
-		starSystem.generate()
-		add_child(starSystem)
-		starSystem.draw()
-		systems.append(starSystem)
-		isSystemGenerated = true
-	else:
-		starSystem.destroy()
-		starSystem = StarSystem.instance()
-		starSystem.generate()
-		add_child(starSystem)
-		starSystem.draw()
-		systems.append(starSystem)
-		isSystemGenerated = true
-
-
-func save():
-	if isSystemGenerated == true:
-		var save_game = File.new()
-		save_game.open("user://savegame.save", File.WRITE)
-		starSystem.save()
-		save_dict = starSystem.save_dict
-		save_game.store_line(to_json(save_dict))
-		save_game.close()
-
-
-func load_game():
-	var save_game = File.new()
-	if not save_game.file_exists("user://savegame.save"):
-		return
-	if isSystemGenerated == true:
-		starSystem.destroy()
-	isSystemGenerated = true
-	save_game.open("user://savegame.save", File.READ)
-	save_dict = parse_json(save_game.get_line())
-	starSystem = StarSystem.instance()
-	systems = []
-	starSystem.load_game(save_dict)
-	systems.append(starSystem)
-	add_child(starSystem)
-	starSystem.draw()
-
-
-func _on_GenerateButton_pressed():
+func _ready():
 	generate()
 
 
-func _on_SaveButton_pressed():
-	save()
+func generate():
+	system = StarSystem.instance()
+	system.generate()
+	systems[current_system] = system
+	draw()
 
 
-func _on_LoadButton_pressed():
-	load_game()
+func draw():
+	print(systems)
+	add_child(systems[current_system])
+	systems[current_system].draw()
+
+
+func save():
+	systems_save = []
+	for system in systems:
+		system.save()
+		systems_save.append(system.save_dict)
+	save_dict['systems'] = systems_save
+
+
+func load_game(save_dict):
+	for system in systems:
+		system.destroy()
+	systems_save = save_dict['systems']
+	systems = []
+	for system_save in systems_save:
+		system = StarSystem.instance()
+		system.load_game(system_save)
+		systems.append(system)
+
+
+func _on_GenerateButton_pressed():
+	systems[current_system].destroy()
+	generate()

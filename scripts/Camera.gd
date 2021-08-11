@@ -5,6 +5,11 @@ var new_speed = Vector2(0, 0)
 onready var CameraPositionLabel = get_node("UI/CameraPosition")
 
 
+func _ready():
+	scale = Vector2(100, 100)
+	zoom = Vector2(100, 100)
+
+
 func _process(delta):
 	CameraPositionLabel.text = 'Camera position: ' + str(round(position.x)) + 'X ' + str(round(position.y)) + 'Y'
 

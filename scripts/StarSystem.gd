@@ -14,9 +14,9 @@ func generate():
 
 
 func draw():
-	for starDraw in stars:
-		add_child(starDraw)
-		starDraw.draw()
+	for star in stars:
+		add_child(star)
+		star.draw()
 
 
 func destroy():
