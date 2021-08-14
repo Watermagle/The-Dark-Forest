@@ -21,6 +21,8 @@ var planet_save_list = []
 var save_dict = {}
 var moons_save = []
 var planets_save = []
+var solidPlanetCount
+var stellarName = '0'
 
 
 func init(inputStellarType):
@@ -35,11 +37,14 @@ func generate():
 		for i in range(round(rand_range(1, 5))):
 			planet = StellarObject.instance()
 			planet.init('solidPlanet')
+			planet.stellarName = stellarName + '-' + str(i)
 			planet.generate()
 			planets.append(planet)
+			solidPlanetCount = i
 		for i in range(round(rand_range(1, 5))):
 			planet = StellarObject.instance()
 			planet.init('gasPlanet')
+			planet.stellarName = stellarName + '-' + str(solidPlanetCount + i)
 			planet.generate()
 			planets.append(planet)
 		for planet in planets:
@@ -61,6 +66,7 @@ func generate():
 		for i in range(round(rand_range(0, 3))):
 			moon = StellarObject.instance()
 			moon.init('moon')
+			moon.stellarName = self.stellarName + '-' + str(i)
 			moons.append(moon)
 		for moon in moons:
 			currentOffset += rand_range(moonOffset - moonOffset * 0.25, moonOffset + moonOffset * 0.25)
@@ -74,6 +80,7 @@ func generate():
 		for i in range(round(rand_range(0, 10))):
 			moon = StellarObject.instance()
 			moon.init('moon')
+			moon.stellarName = stellarName + '-' + str(i)
 			moons.append(moon)
 		for moon in moons:
 			currentOffset += rand_range(gasMoonOffset - gasMoonOffset * 0.25, gasMoonOffset + gasMoonOffset * 0.25)
@@ -115,6 +122,7 @@ func save():
 	save_dict['self_modulate_g'] = self_modulate.g8
 	save_dict['self_modulate_b'] = self_modulate.b8
 	save_dict['stellarType'] = stellarType
+	save_dict['stellarName'] = stellarName
 	if (stellarType == 'solidPlanet') or (stellarType == 'gasPlanet'):
 		moons_save = []
 		for moon in moons:
@@ -138,6 +146,7 @@ func load_game(save_dict):
 	self_modulate.r8 = save_dict['self_modulate_r']
 	self_modulate.g8 = save_dict['self_modulate_g']
 	self_modulate.b8 = save_dict['self_modulate_b']
+	stellarName = save_dict['stellarName']
 	if (stellarType == 'solidPlanet') or (stellarType == 'gasPlanet'):
 		moons_save = save_dict['moons']
 		moons = []
