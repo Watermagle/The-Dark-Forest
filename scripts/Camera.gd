@@ -3,15 +3,37 @@ export(float) var camera_speed = 0
 export(float) var zoom_divider = 0
 var new_speed = Vector2(0, 0)
 onready var CameraPositionLabel = get_node("UI/CameraPosition")
+var showPlanetOrbits = false
+var showMoonOrbits = false
+var showNothing = false
+signal planet
+signal moon
+signal nothing
 
 
 func _ready():
-	scale = Vector2(100, 100)
-	zoom = Vector2(100, 100)
+	zoom.x = 5000
+	zoom.y = 5000
+	scale.x = 5000
+	scale.y = 5000
 
 
 func _process(delta):
-	CameraPositionLabel.text = 'Camera position: ' + str(round(position.x)) + 'X ' + str(round(position.y)) + 'Y'
+	if (zoom.x > 25) and (showPlanetOrbits == false):
+		showPlanetOrbits = true
+		showMoonOrbits = false
+		showNothing = false
+		emit_signal('planet')
+	if (zoom.x < 25) and (showMoonOrbits == false):
+		showPlanetOrbits = false
+		showMoonOrbits = true
+		showNothing = false
+		emit_signal('moon')
+	if (zoom.x < 0.1) and (showNothing == false):
+		showPlanetOrbits = false
+		showMoonOrbits = false
+		showNothing = true
+		emit_signal("nothing")
 
 
 func _physics_process(delta):
@@ -48,8 +70,14 @@ func _input(event):
 				zoom.y += zoom.y / zoom_divider
 				scale.x += scale.x / zoom_divider
 				scale.y += scale.y / zoom_divider
-				if zoom.x > 1000:
-					zoom.x = 1000
-					zoom.y = 1000
-					scale.x = 1000
-					scale.y = 1000
+				if zoom.x > 5000:
+					zoom.x = 5000
+					zoom.y = 5000
+					scale.x = 5000
+					scale.y = 5000
+
+
+func _on_SystemGenerator_repass():
+	showPlanetOrbits = false
+	showMoonOrbits = false
+	showNothing = false

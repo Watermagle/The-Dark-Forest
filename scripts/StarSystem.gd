@@ -39,3 +39,18 @@ func load_game(save_dict):
 		star = StellarObject.instance()
 		star.load_game(star_save)
 		stars.append(star)
+
+
+func passPlanet():
+	for star in stars:
+		star.passPlanet()
+
+
+func passMoon():
+	for star in stars:
+		star.passMoon()
+
+
+func passNothing():
+	for star in stars:
+		star.passNothing()

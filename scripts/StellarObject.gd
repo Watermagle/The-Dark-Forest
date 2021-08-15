@@ -1,5 +1,6 @@
 extends MeshInstance2D
 var StellarObject = load('res://scenes/StellarObject.tscn')
+var Orbit = load('res://scenes/Orbit.tscn')
 var stellarType
 var planets = []
 var moons = []
@@ -13,7 +14,7 @@ var standartSolidMoonRadius = 0.2
 var standartGasMoonRadius = 0.02
 var standartSolidPlanetRadius = 0.01
 var standartGasPlanetRadius = 0.1
-var standartStarRadius = 5000
+var standartStarRadius = 500
 var currentOffset = 0
 var randomRadius
 var moon_save_list = []
@@ -23,6 +24,13 @@ var moons_save = []
 var planets_save = []
 var solidPlanetCount
 var stellarName = '0'
+var planetOrbits = []
+var moonOrbits = []
+var orbit
+var showPlanetOrbits = false
+var showMoonOrbits = false
+var planetMarker
+var planetMarkers = []
 
 
 func init(inputStellarType):
@@ -63,13 +71,13 @@ func generate():
 	
 	if self.stellarType == 'solidPlanet':
 		randomize()
-		for i in range(round(rand_range(0, 3))):
+		for i in range(round(rand_range(1, 3))):
 			moon = StellarObject.instance()
 			moon.init('moon')
 			moon.stellarName = self.stellarName + '-' + str(i)
 			moons.append(moon)
 		for moon in moons:
-			currentOffset += rand_range(moonOffset - moonOffset * 0.25, moonOffset + moonOffset * 0.25)
+			currentOffset += rand_range(moonOffset - moonOffset * 0.25, moonOffset + moonOffset * 2)
 			moon.position = Vector2(0, currentOffset)
 			randomRadius = rand_range(standartSolidMoonRadius - standartSolidMoonRadius * 0.25, standartSolidMoonRadius + standartSolidMoonRadius * 0.25)
 			moon.scale = Vector2(randomRadius, randomRadius)
@@ -77,17 +85,48 @@ func generate():
 	
 	if self.stellarType == 'gasPlanet':
 		randomize()
-		for i in range(round(rand_range(0, 10))):
+		for i in range(round(rand_range(1, 10))):
 			moon = StellarObject.instance()
 			moon.init('moon')
 			moon.stellarName = stellarName + '-' + str(i)
 			moons.append(moon)
 		for moon in moons:
-			currentOffset += rand_range(gasMoonOffset - gasMoonOffset * 0.25, gasMoonOffset + gasMoonOffset * 0.25)
+			currentOffset += rand_range(gasMoonOffset - gasMoonOffset * 0.25, gasMoonOffset + gasMoonOffset * 2)
 			moon.position = Vector2(0, currentOffset)
 			randomRadius = rand_range(standartGasMoonRadius - standartGasMoonRadius * 0.25, standartGasMoonRadius + standartGasMoonRadius * 0.25)
 			moon.scale = Vector2(randomRadius, randomRadius)
 			moon.self_modulate = Color(rand_range(0, 1), rand_range(0, 1), rand_range(0, 1))
+
+
+func generateOrbits():
+	if self.stellarType == 'star':
+		planetOrbits = []
+		planetMarkers = []
+		for planet in planets:
+			orbit = Orbit.instance()
+			orbit.init(Vector2(0, 0), planet.position.y, Color(1, 1, 1), 1.0)
+			planetOrbits.append(orbit)
+			
+			planetMarker = Orbit.instance()
+			if planet.stellarType == 'solidPlanet':
+				planetMarker.init(planet.position, 5, Color(1, 1, 1), 1.1)
+			elif planet.stellarType == 'gasPlanet':
+				planetMarker.init(planet.position, 50, Color(1, 1, 1), 10.0)
+			planetMarkers.append(planetMarker)
+	if (self.stellarType == 'solidPlanet') or (self.stellarType == 'gasPlanet'):
+		moonOrbits = []
+		planetMarkers = []
+		for moon in moons:
+			orbit = Orbit.instance()
+			orbit.init(Vector2(0, 0), moon.position.y, Color(1, 1, 1), 1.0)
+			moonOrbits.append(orbit)
+			
+			planetMarker = Orbit.instance()
+			if self.stellarType == 'solidPlanet':
+				planetMarker.init(moon.position, 10, Color(1, 1, 1), 2.0)
+			elif self.stellarType == 'gasPlanet':
+				planetMarker.init(moon.position, 2, Color(1, 1, 1), 1.0)
+			planetMarkers.append(planetMarker)
 
 
 func draw():
@@ -98,6 +137,68 @@ func draw():
 	if (self.stellarType == 'solidPlanet') or (self.stellarType == 'gasPlanet'):
 		for moon in moons:
 			add_child(moon)
+	generateOrbits()
+	drawOrbits()
+
+
+func drawOrbits():
+	if (self.stellarType == 'star'):
+		if showPlanetOrbits == true:
+			for orbit in planetOrbits:
+				add_child(orbit)
+				orbit.orbitUpdate()
+			for planetMarker in planetMarkers:
+				add_child(planetMarker)
+				planetMarker.orbitUpdate()
+			for planet in planets:
+				for orbit in planet.moonOrbits:
+					orbit.queue_free()
+				for planetMarker in planet.planetMarkers:
+					planetMarker.queue_free()
+				planet.generateOrbits()
+		elif showMoonOrbits == true:
+			for orbit in planetOrbits:
+				orbit.queue_free()
+			for planetMarker in planetMarkers:
+				planetMarker.queue_free()
+			generateOrbits()
+			for planet in planets:
+				for orbit in planet.moonOrbits:
+					planet.add_child(orbit)
+					orbit.orbitUpdate()
+				for planetMarker in planet.planetMarkers:
+					planet.add_child(planetMarker)
+					planetMarker.orbitUpdate()
+		else:
+			for orbit in planetOrbits:
+				orbit.queue_free()
+			for planetMarker in planetMarkers:
+				planetMarker.queue_free()
+			generateOrbits()
+			for planet in planets:
+				for orbit in planet.moonOrbits:
+					orbit.queue_free()
+				for planetMarker in planet.planetMarkers:
+					planetMarker.queue_free()
+				planet.generateOrbits()
+
+
+func passPlanet():
+	showPlanetOrbits = true
+	showMoonOrbits = false
+	drawOrbits()
+
+
+func passMoon():
+	showPlanetOrbits = false
+	showMoonOrbits = true
+	drawOrbits()
+
+
+func passNothing():
+	showPlanetOrbits = false
+	showMoonOrbits = false
+	drawOrbits()
 
 
 func destroy():
@@ -161,3 +262,4 @@ func load_game(save_dict):
 			planet = StellarObject.instance()
 			planet.load_game(planet_save)
 			planets.append(planet)
+	drawOrbits()

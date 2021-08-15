@@ -32,7 +32,6 @@ script = ExtResource( 5 )
 script = ExtResource( 6 )
 
 [node name="Camera" type="Camera2D" parent="."]
-position = Vector2( 960, 540 )
 current = true
 script = ExtResource( 4 )
 __meta__ = {
@@ -120,19 +119,10 @@ margin_bottom = 152.0
 custom_fonts/font = SubResource( 3 )
 text = "EXIT"
 
-[node name="CameraPosition" type="Label" parent="Camera/UI"]
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_top = -51.0
-custom_fonts/font = SubResource( 2 )
-text = "Camera position:"
-align = 1
-valign = 1
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
+[connection signal="repass" from="SystemGenerator" to="Camera" method="_on_SystemGenerator_repass"]
+[connection signal="moon" from="Camera" to="SystemGenerator" method="_on_Camera_moon"]
+[connection signal="nothing" from="Camera" to="SystemGenerator" method="_on_Camera_nothing"]
+[connection signal="planet" from="Camera" to="SystemGenerator" method="_on_Camera_planet"]
 [connection signal="pressed" from="Camera/UI/DebugPanel/VBoxContainer/GenerateButton" to="SystemGenerator" method="_on_GenerateButton_pressed"]
 [connection signal="pressed" from="Camera/UI/DebugPanel/VBoxContainer/SaveButton" to="SaveSystem" method="_on_SaveButton_pressed"]
 [connection signal="pressed" from="Camera/UI/DebugPanel/VBoxContainer/LoadButton" to="SaveSystem" method="_on_LoadButton_pressed"]
